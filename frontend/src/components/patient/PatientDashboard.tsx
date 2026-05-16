@@ -59,7 +59,12 @@ export const PatientDashboard: React.FC<PatientDashboardProps> = ({
       case "advice":
         return <DoctorAdvice patientId={patient.user.id.toString()} />;
       case "reports":
-        return <ProgressReports patientId={patient.user.id.toString()} />;
+        return (
+          <ProgressReports
+            patientId={patient.user.id.toString()}
+            doctorId={patient.assigned_doctor}
+          />
+        );
       case "analytics":
         return <HealthAnalytics patientId={patient.user.id.toString()} />;
       default:

@@ -3,17 +3,19 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { format } from "date-fns";
-import { appointmentsAPI } from "../../services/api";
+import { appointmentsAPI, downloadFileFromURL } from "../../services/api";
 import { PatientReport } from "../../types";
 import { FileText, Upload, Download, Eye, Calendar } from "lucide-react";
 // import { User } from "lucide-react";
 
 interface ProgressReportsProps {
   patientId: string;
+  doctorId: string;
 }
 
 export const ProgressReports: React.FC<ProgressReportsProps> = ({
   patientId,
+  doctorId,
 }) => {
   const [reports, setReports] = useState<PatientReport[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +26,7 @@ export const ProgressReports: React.FC<ProgressReportsProps> = ({
     fileType: "text" as "pdf" | "image" | "text",
     content: "",
   });
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -45,16 +48,25 @@ export const ProgressReports: React.FC<ProgressReportsProps> = ({
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const reportData = {
-        patient: patientId,
-        doctor: 1, // This should be the assigned doctor ID
-        description: uploadData.description,
-        file_type: uploadData.fileType,
-        file_content:
-          uploadData.fileType === "text" ? uploadData.content : null,
-      };
+      const formData = new FormData();
 
-      await appointmentsAPI.createPatientReport(reportData);
+      formData.append("patient", patientId.toString());
+      formData.append("doctor", doctorId);
+      formData.append("description", uploadData.description);
+      formData.append("file_type", uploadData.fileType);
+
+      if (uploadData.fileType === "text") {
+        formData.append("file_content", uploadData.content);
+      }
+
+      if (
+        (uploadData.fileType === "pdf" || uploadData.fileType === "image") &&
+        selectedFile
+      ) {
+        formData.append("file", selectedFile);
+      }
+
+      await appointmentsAPI.createPatientReport(formData);
 
       // Refresh reports list
       const updatedReports = await appointmentsAPI.getPatientReports(patientId);
@@ -68,14 +80,8 @@ export const ProgressReports: React.FC<ProgressReportsProps> = ({
     }
   };
 
-  const [selectedFile, setSelectedFile] = useState(null);
   const onFileChange = (event: any) => {
     setSelectedFile(event.target.files[0]);
-  };
-  const onFileUpload = () => {
-    // const formData = new FormData();
-    // formData.append("myFile", selectedFile, selectedFile.name);
-    console.log(selectedFile);
   };
 
   const getFileIcon = (fileType: string) => {
@@ -179,16 +185,10 @@ export const ProgressReports: React.FC<ProgressReportsProps> = ({
               </div>
             )}
             {uploadData.fileType === "pdf" && (
-              <>
-                <input type="file" onChange={onFileChange} />
-                <button onClick={onFileUpload}>Upload!</button>
-              </>
+              <input type="file" onChange={onFileChange} accept=".pdf" />
             )}
             {uploadData.fileType === "image" && (
-              <>
-                <input type="file" onChange={onFileChange} />
-                <button onClick={onFileUpload}>Upload!</button>
-              </>
+              <input type="file" onChange={onFileChange} accept="image/*" />
             )}
 
             <div className="flex space-x-3">
@@ -252,10 +252,18 @@ export const ProgressReports: React.FC<ProgressReportsProps> = ({
                       <Eye className="h-4 w-4 mr-2" />
                       View
                     </Button> */}
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
+                    {(report.file_type === "image" ||
+                      report.file_type === "pdf") &&
+                      report.file && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => downloadFileFromURL(report.file!)}
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      )}
                   </div>
                 </div>
               </div>

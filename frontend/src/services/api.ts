@@ -1,4 +1,5 @@
 const API_BASE_URL = "http://localhost:8000/api";
+const BASE_URL = "http://localhost:8000";
 
 // Token management
 export const getToken = () => localStorage.getItem("access_token");
@@ -14,7 +15,9 @@ export const removeToken = () => {
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   const token = getToken();
   const headers = {
-    "Content-Type": "application/json",
+    ...(!(options.body instanceof FormData) && {
+      "Content-Type": "application/json",
+    }),
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
@@ -170,16 +173,10 @@ export const appointmentsAPI = {
     return apiRequest(`/appointments/reports/patient/${patientId}/`);
   },
 
-  createPatientReport: async (data: {
-    patient: string;
-    doctor: number;
-    description: string;
-    file_type: "text" | "pdf" | "image";
-    file_content: string | null;
-  }) => {
+  createPatientReport: async (data: FormData) => {
     return apiRequest("/appointments/reports/create/", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     });
   },
 
@@ -232,4 +229,13 @@ export const doctorsAPI = {
   getDoctorPatients: async (doctorId: string) => {
     return apiRequest(`/doctors/${doctorId}/patients/`);
   },
+};
+
+export const downloadFileFromURL = (name: string) => {
+  const link = document.createElement("a");
+  link.download = name;
+  link.href = BASE_URL + name;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
