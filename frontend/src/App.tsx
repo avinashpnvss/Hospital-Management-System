@@ -36,6 +36,7 @@ import {
   Globe,
   Award,
 } from "lucide-react";
+import { ContactUs } from "./components/home/ContactUs";
 
 function App() {
   const [user, setUser] = useState<Patient | Doctor | null>(null);
@@ -501,7 +502,7 @@ function App() {
               <Button
                 size="lg"
                 onClick={() => openAuthModal("register")}
-                className="bg-white text-blue-600 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 px-8 py-4"
+                className="bg-white text-blue-500 hover:bg-gray-100 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 px-8 py-4"
               >
                 Get Started Today
                 <ArrowRight className="h-5 w-5 ml-2" />
@@ -574,9 +575,7 @@ function App() {
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-white transition-colors">
-                      Contact Us
-                    </a>
+                    <ContactUs />
                   </li>
                   <li>
                     <a href="#" className="hover:text-white transition-colors">
