@@ -10,7 +10,7 @@ DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "https://health-care-platform-rust.vercel.app/",    # deployed in vercel
+    "health-care-platform-rust.vercel.app/",    # deployed in vercel
 ]
 
 
