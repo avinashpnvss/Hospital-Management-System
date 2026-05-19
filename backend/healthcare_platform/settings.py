@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from pathlib import Path
 from decouple import config
 
@@ -10,7 +11,7 @@ DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "health-care-platform-rust.vercel.app",    # deployed in vercel
+    "health-care-platform-rust.vercel.app",  # deployed in vercel
 ]
 
 
@@ -62,10 +63,11 @@ TEMPLATES = [
 WSGI_APPLICATION = "healthcare_platform.wsgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
