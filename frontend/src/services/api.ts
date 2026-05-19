@@ -1,5 +1,7 @@
-const API_BASE_URL = "http://localhost:8000/api";
-const BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "https://health-care-platform-rust.vercel.app/api";
+const BASE_URL = "https://health-care-platform-rust.vercel.app";
+// const API_BASE_URL = "http://localhost:8000/api";
+// const BASE_URL = "http://localhost:8000";
 
 // Token management
 export const getToken = () => localStorage.getItem("access_token");
